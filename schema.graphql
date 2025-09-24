@@ -1,0 +1,107 @@
+type StakingContract @entity(immutable: false) {
+  id: ID!
+  stakingToken: Bytes!
+  totalStaked: BigInt!
+  currentRewardRate: BigInt!
+  initialApr: BigInt!
+  minLockDuration: BigInt!
+  aprReductionPerThousand: BigInt!
+  emergencyWithdrawPenalty: BigInt!
+  totalRewards: BigInt!
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}
+
+type User @entity(immutable: false) {
+  id: ID! # user address
+  stakedAmount: BigInt!
+  totalRewardsClaimed: BigInt!
+  totalEmergencyWithdrawals: BigInt!
+  lastStakeTimestamp: BigInt!
+  stakes: [Stake!]! @derivedFrom(field: "user")
+  rewards: [RewardClaim!]! @derivedFrom(field: "user")
+  withdrawals: [Withdrawal!]! @derivedFrom(field: "user")
+  emergencyWithdrawals: [EmergencyWithdrawal!]! @derivedFrom(field: "user")
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}
+
+type Stake @entity(immutable: true) {
+  id: ID! # transaction hash + log index
+  user: User!
+  amount: BigInt!
+  timestamp: BigInt!
+  newTotalStaked: BigInt!
+  currentRewardRate: BigInt!
+  transactionHash: Bytes!
+  blockNumber: BigInt!
+}
+
+type Withdrawal @entity(immutable: true) {
+  id: ID! # transaction hash + log index
+  user: User!
+  amount: BigInt!
+  timestamp: BigInt!
+  newTotalStaked: BigInt!
+  currentRewardRate: BigInt!
+  rewardsAccrued: BigInt!
+  transactionHash: Bytes!
+  blockNumber: BigInt!
+}
+
+type RewardClaim @entity(immutable: true) {
+  id: ID! # transaction hash + log index
+  user: User!
+  amount: BigInt!
+  timestamp: BigInt!
+  newPendingRewards: BigInt!
+  totalStaked: BigInt!
+  transactionHash: Bytes!
+  blockNumber: BigInt!
+}
+
+type EmergencyWithdrawal @entity(immutable: true) {
+  id: ID! # transaction hash + log index
+  user: User!
+  amount: BigInt!
+  penalty: BigInt!
+  timestamp: BigInt!
+  newTotalStaked: BigInt!
+  transactionHash: Bytes!
+  blockNumber: BigInt!
+}
+
+type RewardRateUpdate @entity(immutable: true) {
+  id: ID! # transaction hash + log index
+  oldRate: BigInt!
+  newRate: BigInt!
+  timestamp: BigInt!
+  totalStaked: BigInt!
+  transactionHash: Bytes!
+  blockNumber: BigInt!
+}
+
+type DailyStats @entity(immutable: false) {
+  id: ID! # date in YYYY-MM-DD format
+  date: String!
+  totalStaked: BigInt!
+  totalUsers: BigInt!
+  totalStakes: BigInt!
+  totalWithdrawals: BigInt!
+  totalRewardsClaimed: BigInt!
+  totalEmergencyWithdrawals: BigInt!
+  averageStakeAmount: BigInt!
+  currentRewardRate: BigInt!
+}
+
+type GlobalStats @entity(immutable: false) {
+  id: ID! # always "global"
+  totalStaked: BigInt!
+  totalUsers: BigInt!
+  totalStakes: BigInt!
+  totalWithdrawals: BigInt!
+  totalRewardsClaimed: BigInt!
+  totalEmergencyWithdrawals: BigInt!
+  currentRewardRate: BigInt!
+  lastUpdated: BigInt!
+}
